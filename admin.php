@@ -2,23 +2,15 @@
 
 require 'db.php';
 
-echo '<pre>';
-
-print_r($_SERVER);
-
-echo '</pre>';
-
-exit();
-
 $pdo = connectDB();
 
-if (!isset($_SERVER['PHP_AUTH_USER']) ||
-    !isset($_SERVER['PHP_AUTH_PW'])) {
+if (!isset($_SERVER['PHP_AUTH_USER'])) {
 
     header('WWW-Authenticate: Basic realm="Admin Area"');
     header('HTTP/1.0 401 Unauthorized');
 
     echo 'Требуется авторизация';
+
     exit();
 }
 
@@ -27,24 +19,27 @@ $stmt = $pdo->prepare("
     WHERE login = ?
 ");
 
-$stmt->execute([$_SERVER['PHP_AUTH_USER']]);
+$stmt->execute([
+    $_SERVER['PHP_AUTH_USER']
+]);
 
 $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-echo '<pre>';
+if (
+    !$admin ||
+    !password_verify(
+        $_SERVER['PHP_AUTH_PW'],
+        $admin['password_hash']
+    )
+) {
 
-print_r($admin);
+    header('WWW-Authenticate: Basic realm="Admin Area"');
+    header('HTTP/1.0 401 Unauthorized');
 
-echo '</pre>';
+    echo 'Неверный логин или пароль';
 
-echo password_verify(
-    $_SERVER['PHP_AUTH_PW'],
-    $admin['password_hash']
-)
-? 'PASSWORD OK'
-: 'PASSWORD BAD';
-
-exit();
+    exit();
+}
 
 if (!empty($_GET['delete'])) {
 
@@ -65,6 +60,7 @@ if (!empty($_GET['delete'])) {
     $stmt->execute([$id]);
 
     header('Location: admin.php');
+
     exit();
 }
 
@@ -111,11 +107,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         foreach ($_POST['languages'] as $language_id) {
 
-            $stmt->execute([$id, $language_id]);
+            $stmt->execute([
+                $id,
+                $language_id
+            ]);
         }
     }
 
     header('Location: admin.php');
+
     exit();
 }
 
@@ -161,10 +161,13 @@ $languages = $pdo->query("
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+
     <meta charset="UTF-8">
+
     <title>Админ-панель</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
 
@@ -177,8 +180,11 @@ $languages = $pdo->query("
     <table>
 
         <tr>
+
             <th>Язык</th>
+
             <th>Количество пользователей</th>
+
         </tr>
 
         <?php foreach ($stats as $stat): ?>
@@ -203,6 +209,20 @@ $languages = $pdo->query("
 
     <?php foreach ($applications as $app): ?>
 
+        <?php
+
+        $stmt = $pdo->prepare("
+            SELECT language_id
+            FROM application_languages
+            WHERE application_id = ?
+        ");
+
+        $stmt->execute([$app['id']]);
+
+        $selected = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        ?>
+
         <form method="POST" class="admin-form">
 
             <input
@@ -219,11 +239,87 @@ $languages = $pdo->query("
                 value="<?= htmlspecialchars($app['full_name']) ?>"
             >
 
+            <label>Телефон</label>
+
+            <input
+                type="text"
+                name="phone"
+                value="<?= htmlspecialchars($app['phone']) ?>"
+            >
+
+            <label>Email</label>
+
+            <input
+                type="text"
+                name="email"
+                value="<?= htmlspecialchars($app['email']) ?>"
+            >
+
+            <label>Дата рождения</label>
+
+            <input
+                type="date"
+                name="birth_date"
+                value="<?= htmlspecialchars($app['birth_date']) ?>"
+            >
+
+            <label>Пол</label>
+
+            <select name="gender">
+
+                <option
+                    value="male"
+                    <?= $app['gender'] == 'male'
+                        ? 'selected'
+                        : '' ?>
+                >
+                    Мужской
+                </option>
+
+                <option
+                    value="female"
+                    <?= $app['gender'] == 'female'
+                        ? 'selected'
+                        : '' ?>
+                >
+                    Женский
+                </option>
+
+            </select>
+
+            <label>Биография</label>
+
+            <textarea name="biography" rows="5"><?= htmlspecialchars($app['biography']) ?></textarea>
+
+            <label>Языки программирования</label>
+
+            <select name="languages[]" multiple>
+
+                <?php foreach ($languages as $language): ?>
+
+                    <option
+                        value="<?= $language['id'] ?>"
+                        <?= in_array($language['id'], $selected)
+                            ? 'selected'
+                            : '' ?>
+                    >
+
+                        <?= htmlspecialchars($language['name']) ?>
+
+                    </option>
+
+                <?php endforeach; ?>
+
+            </select>
+
             <button type="submit">
-                Сохранить
+                Сохранить изменения
             </button>
 
-            <a href="admin.php?delete=<?= $app['id'] ?>">
+            <a
+                href="admin.php?delete=<?= $app['id'] ?>"
+                onclick="return confirm('Удалить запись?')"
+            >
                 Удалить
             </a>
 

@@ -23,19 +23,20 @@ $stmt->execute([$_SERVER['PHP_AUTH_USER']]);
 
 $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (
-    !$admin ||
-    !password_verify(
-        $_SERVER['PHP_AUTH_PW'],
-        $admin['password_hash']
-    )
-) {
+echo '<pre>';
 
-    header('HTTP/1.0 401 Unauthorized');
+print_r($admin);
 
-    echo 'Неверный логин или пароль';
-    exit();
-}
+echo '</pre>';
+
+echo password_verify(
+    $_SERVER['PHP_AUTH_PW'],
+    $admin['password_hash']
+)
+? 'PASSWORD OK'
+: 'PASSWORD BAD';
+
+exit();
 
 if (!empty($_GET['delete'])) {
 

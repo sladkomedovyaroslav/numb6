@@ -1,11 +1,64 @@
-.admin-form {
-    margin-top: 40px;
-    padding: 20px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background: #f9fafb;
+body {
+    margin: 0;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f3f4f6;
+    color: #1f2937;
 }
 
-hr {
-    margin: 40px 0;
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 32px;
+    color: #111827;
+}
+
+h2 {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.author {
+    margin-bottom: 30px;
+    color: #6b7280;
+}
+
+label {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #f9fafb;
+    box-sizing: border-box;
+    font-size: 15px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #9ca3af;
+}
+
+textarea {
+    resize: vertical;
 }

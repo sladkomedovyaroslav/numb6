@@ -2,6 +2,14 @@
 
 require 'db.php';
 
+echo '<pre>';
+
+print_r($_SERVER);
+
+echo '</pre>';
+
+exit();
+
 $pdo = connectDB();
 
 if (!isset($_SERVER['PHP_AUTH_USER']) ||

@@ -2,8 +2,10 @@
 
 require 'db.php';
 
+// Подключение к БД
 $pdo = connectDB();
 
+// Проверка HTTP Basic Authorization
 if (!isset($_SERVER['PHP_AUTH_USER'])) {
 
     header('WWW-Authenticate: Basic realm="Admin Area"');
@@ -14,6 +16,7 @@ if (!isset($_SERVER['PHP_AUTH_USER'])) {
     exit();
 }
 
+// Поиск администратора по логину
 $stmt = $pdo->prepare("
     SELECT * FROM admins
     WHERE login = ?
@@ -25,6 +28,7 @@ $stmt->execute([
 
 $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Проверка пароля администратора
 if (
     !$admin ||
     !password_verify(
@@ -41,10 +45,12 @@ if (
     exit();
 }
 
+// Удаление анкеты
 if (!empty($_GET['delete'])) {
 
     $id = (int) $_GET['delete'];
 
+    // Сначала удаляем связанные языки
     $stmt = $pdo->prepare("
         DELETE FROM application_languages
         WHERE application_id = ?
@@ -52,6 +58,7 @@ if (!empty($_GET['delete'])) {
 
     $stmt->execute([$id]);
 
+    // Затем саму анкету
     $stmt = $pdo->prepare("
         DELETE FROM applications
         WHERE id = ?
@@ -64,10 +71,12 @@ if (!empty($_GET['delete'])) {
     exit();
 }
 
+// Сохранение изменений анкеты
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $id = (int) $_POST['id'];
 
+    // Обновление данных пользователя
     $stmt = $pdo->prepare("
         UPDATE applications
         SET
@@ -90,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $id
     ]);
 
+    // Удаляем старые языки
     $stmt = $pdo->prepare("
         DELETE FROM application_languages
         WHERE application_id = ?
@@ -97,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $stmt->execute([$id]);
 
+    // Добавляем выбранные языки заново
     if (!empty($_POST['languages'])) {
 
         $stmt = $pdo->prepare("
@@ -119,6 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit();
 }
 
+// Получение всех анкет
 $stmt = $pdo->query("
     SELECT 
         a.*,
@@ -138,6 +150,7 @@ $stmt = $pdo->query("
 
 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Получение статистики по языкам
 $stmt = $pdo->query("
     SELECT
         pl.name,
@@ -152,6 +165,7 @@ $stmt = $pdo->query("
 
 $stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Получение списка всех языков
 $languages = $pdo->query("
     SELECT * FROM programming_languages
 ")->fetchAll(PDO::FETCH_ASSOC);
@@ -187,6 +201,7 @@ $languages = $pdo->query("
 
         </tr>
 
+        <!-- Вывод статистики -->
         <?php foreach ($stats as $stat): ?>
 
             <tr>
@@ -211,6 +226,7 @@ $languages = $pdo->query("
 
         <?php
 
+        // Получаем языки конкретного пользователя
         $stmt = $pdo->prepare("
             SELECT language_id
             FROM application_languages
@@ -223,6 +239,7 @@ $languages = $pdo->query("
 
         ?>
 
+        <!-- Форма редактирования анкеты -->
         <form method="POST" class="admin-form">
 
             <input
@@ -316,6 +333,7 @@ $languages = $pdo->query("
                 Сохранить изменения
             </button>
 
+            <!-- Удаление анкеты -->
             <a
                 href="admin.php?delete=<?= $app['id'] ?>"
                 onclick="return confirm('Удалить запись?')"

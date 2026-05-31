@@ -2,8 +2,10 @@
 
 require 'db.php';
 
+// Подключение к БД
 $pdo = connectDB();
 
+// Получение всех анкет вместе с языками программирования
 $stmt = $pdo->query("
     SELECT 
         a.*,
@@ -21,6 +23,7 @@ $stmt = $pdo->query("
     ORDER BY a.id DESC
 ");
 
+// Сохранение результата запроса
 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
@@ -39,6 +42,7 @@ $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <h1>Сохраненные анкеты</h1>
 
+    <!-- Таблица со всеми анкетами -->
     <table>
 
         <tr>
@@ -52,6 +56,7 @@ $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <th>Языки</th>
         </tr>
 
+        <!-- Вывод всех записей -->
         <?php foreach ($applications as $app): ?>
 
             <tr>
@@ -86,6 +91,7 @@ $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="links">
 
+        <!-- Возврат на главную страницу -->
         <a href="index.php">
             Вернуться к форме
         </a>

@@ -16,6 +16,7 @@
         Выполнил: Сладкомедов Ярослав, ПМИ 23
     </p>
 
+    <!-- Сообщение об успешном сохранении -->
     <?php if (!empty($messages)): ?>
 
         <div class="success">
@@ -30,6 +31,7 @@
 
     <?php endif; ?>
 
+    <!-- Вывод сгенерированных логина и пароля -->
     <?php if (!empty($generatedCredentials)): ?>
 
         <div class="success">
@@ -40,6 +42,7 @@
 
     <?php endif; ?>
 
+    <!-- Основная форма -->
     <form action="" method="POST">
 
         <label>ФИО</label>
@@ -51,6 +54,7 @@
             value="<?= htmlspecialchars($_COOKIE['full_name_value'] ?? '') ?>"
         >
 
+        <!-- Ошибка для ФИО -->
         <?php if (!empty($error_messages['full_name'])): ?>
 
             <div class="error-message">
@@ -68,6 +72,7 @@
             value="<?= htmlspecialchars($_COOKIE['phone_value'] ?? '') ?>"
         >
 
+        <!-- Ошибка для телефона -->
         <?php if (!empty($error_messages['phone'])): ?>
 
             <div class="error-message">
@@ -85,6 +90,7 @@
             value="<?= htmlspecialchars($_COOKIE['email_value'] ?? '') ?>"
         >
 
+        <!-- Ошибка для email -->
         <?php if (!empty($error_messages['email'])): ?>
 
             <div class="error-message">
@@ -102,6 +108,7 @@
             value="<?= htmlspecialchars($_COOKIE['birth_date_value'] ?? '') ?>"
         >
 
+        <!-- Ошибка для даты рождения -->
         <?php if (!empty($error_messages['birth_date'])): ?>
 
             <div class="error-message">
@@ -136,6 +143,7 @@
 
         </div>
 
+        <!-- Ошибка для пола -->
         <?php if (!empty($error_messages['gender'])): ?>
 
             <div class="error-message">
@@ -152,6 +160,7 @@
             class="<?= $errors['languages'] ? 'error-field' : '' ?>"
         >
 
+            <!-- Список языков из БД -->
             <?php foreach ($languages as $language): ?>
 
                 <option value="<?= $language['id'] ?>">
@@ -164,6 +173,7 @@
 
         </select>
 
+        <!-- Ошибка выбора языков -->
         <?php if (!empty($error_messages['languages'])): ?>
 
             <div class="error-message">
@@ -179,6 +189,7 @@
             rows="6"
         ><?= htmlspecialchars($_COOKIE['biography_value'] ?? '') ?></textarea>
 
+        <!-- Согласие пользователя -->
         <div class="checkbox">
 
             <label>
@@ -194,6 +205,7 @@
 
         </div>
 
+        <!-- Ошибка согласия -->
         <?php if (!empty($error_messages['agreement'])): ?>
 
             <div class="error-message">
@@ -202,6 +214,7 @@
 
         <?php endif; ?>
 
+        <!-- Кнопка сохранения или обновления -->
         <button type="submit">
             <?= !empty($_SESSION['user_id']) ? 'Обновить данные' : 'Сохранить' ?>
         </button>
@@ -210,12 +223,14 @@
 
     <div class="links">
 
+        <!-- Просмотр анкет -->
         <a href="view.php">
             Просмотреть анкеты
         </a>
 
         <br><br>
 
+        <!-- Вход или выход пользователя -->
         <?php if (empty($_SESSION['user_id'])): ?>
 
             <a href="login.php">
